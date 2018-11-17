@@ -1,0 +1,49 @@
+group 'com.umusic.source.dataflow'
+version '1.1.0'
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'eclipse'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+mainClassName = "com.umusic.source.dataflow.global.SourceFactory"
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+    
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Source Pipelines',
+                'Implementation-Version': version,
+                'Main-Class': mainClassName
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task resources {
+    def resourcesDir = new File("build/resources/main")
+    resourcesDir.mkdirs()
+}
+
+
+run {
+
+    if (project.hasProperty("args")) {
+
+        args project.args.split("\\s")
+    }
+}
+
+run.mustRunAfter 'resources'
